@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "nodemon --exec babel-node src/index.js",
     "build": "babel src -d dist",
-    "start": "node dist/index.js"
+    "start": "nodemon --exec babel-node src/index.js"
   },
   "keywords": [
     "express",
@@ -25,10 +25,13 @@
     "nodemon": "^3.1.14"
   },
   "dependencies": {
+    "@neon/config": "^1.10.0",
+    "@neon/env": "^1.6.8",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
-    "pg": "^8.23.0",
+    "pg": "^8.23.1",
+    "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.8"
   }
 }

@@ -42,7 +42,7 @@ sequelize.sync({ force: eraseDatabaseOnSync }).then(async () => {
   if (eraseDatabaseOnSync) {
     createUsersWithMessages();
   }
-  app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+  app.listen(port, () => console.log(`Bando de dados iniciado na porta ${port}!`));
 });
 
 const createUsersWithMessages = async () => {
