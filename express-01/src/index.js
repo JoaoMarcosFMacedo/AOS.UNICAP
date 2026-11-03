@@ -1,81 +1,26 @@
 import "dotenv/config";
 import cors from "cors";
 import express from "express";
-import models, { sequelize } from "./models/index.js";
-import routes from "./routes/index.js";
+import { sequelize } from "./models/index.js";
 
 const app = express();
 
-app.set("trust proxy", true);
-
-// middlewares
+// Middlewares
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// middleware the logs
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.path} - ${req.ip}`);
-  next();
-});
-// middleware de autenticação "fake" + injeção dos models no req.context
-app.use(async (req, res, next) => {
-  req.context = {
-    models,
-    me: await models.User.findByLogin("rwieruch"),
-  };
-  next();
-});
 
-// rotas
+// Rota base de teste
 app.get("/", (req, res) => {
-  return res.send("Servidor express exectuando...");
+  return res.send("API do Currículo Express conectada e executando!");
 });
-app.use("/session", routes.session);
-app.use("/users", routes.user);
-app.use("/messages", routes.message);
 
 const port = process.env.PORT || 3000;
 
-const eraseDatabaseOnSync = process.env.ERASE_DATABASE_ON_SYNC === "true";
-
-sequelize.sync({ force: eraseDatabaseOnSync }).then(async () => {
-  if (eraseDatabaseOnSync) {
-    createUsersWithMessages();
-  }
-  app.listen(port, () => console.log(`Bando de dados iniciado na porta ${port}!`));
+// Sincroniza o banco de dados NeonDB e inicia o servidor
+sequelize.sync({ alter: true }).then(() => {
+  console.log('Banco de dados sincronizado com sucesso no NeonDB!');
+  app.listen(port, () => console.log(`Servidor iniciado na porta ${port}!`));
+}).catch((error) => {
+  console.error('Erro ao sincronizar o banco de dados:', error);
 });
-
-const createUsersWithMessages = async () => {
-  await models.User.create(
-    {
-      username: "rwieruch",
-      email: "rwieruch@email.com",
-      messages: [
-        {
-          text: "Published the Road to learn React",
-        },
-      ],
-    },
-    {
-      include: [models.Message],
-    },
-  );
-
-  await models.User.create(
-    {
-      username: "ddavids",
-      email: "ddavids@email.com",
-      messages: [
-        {
-          text: "Happy to release ...",
-        },
-        {
-          text: "Published a complete ...",
-        },
-      ],
-    },
-    {
-      include: [models.Message],
-    },
-  );
-};
